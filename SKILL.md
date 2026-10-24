@@ -1,87 +1,102 @@
 ---
 name: microsoft-rust-guidelines
-description: Apply Microsoft's Pragmatic Rust Guidelines when writing, reviewing, or refactoring Rust code. Select original rules by topic and M-* identifier for APIs, correctness, async code, performance, documentation, and workspace design.
+description: Apply Microsoft's Pragmatic Rust Guidelines when writing, reviewing, or refactoring Rust code. Selects the relevant M-* rules by topic or identifier, covering API design, error handling, correctness and unsafe code, async, performance, documentation, FFI, macros, and workspace layout.
 ---
 
 # Microsoft Rust Guidelines
 
-Use Microsoft's guidelines as a source of concrete Rust design advice. This is an
-independent skill packaging, not a Microsoft product. The complete rule texts are
-bundled locally; normal use needs no network access.
+This skill provides Microsoft's
+[Pragmatic Rust Guidelines](https://microsoft.github.io/rust-guidelines/) as a
+local reference. The full text of every rule is bundled under `references/`, so
+no network access is needed. This packaging is independent and not a Microsoft
+product.
 
-## Select the relevant rules
+## Selecting rules
 
-1. Inspect the task and repository instructions. Identify whether the affected
-   crate is an application, an internal application crate, or a reusable library;
-   note its MSRV, targets, runtime, and public compatibility requirements.
-2. Open [the rule index](references/index.md), select the relevant topic below,
-   then read the linked rule files. For a named `M-*` rule, find that identifier
-   directly. Do not load every rule for an ordinary edit.
-3. Read a selected rule in full, including its exceptions and examples. Follow
-   cross-references when they affect the decision. An index title alone is not
-   enough evidence to apply a rule.
+1. Establish the context: the kind of crate affected (application, crate used
+   only by an application, or reusable library), its MSRV, targets, async
+   runtime, and public compatibility commitments, plus any repository
+   instructions.
+2. Open the [rule index](references/index.md) and locate the relevant section
+   from the table below, or search for a named `M-*` identifier directly. Load
+   only the rules the task needs.
+3. Read each selected rule in full, including its exceptions and examples, and
+   follow cross-references that bear on the decision. Do not apply a rule on the
+   strength of its title alone.
 
-| Work being done | Index section |
+| Area of work | Index section |
 | --- | --- |
-| Naming, common traits, logging, lints | Universal |
-| Application errors, allocator, deployment CPU | Application |
-| Panics, unsafe, soundness | Correctness |
-| Rustdoc, examples, public documentation | Documentation |
-| Foreign interfaces, DLL boundaries | FFI |
-| Features, dependencies, build experience | Libraries / Building |
-| `Send`, conversions, I/O traits, foreign types | Libraries / Interoperability |
-| Global state, strong types, mocking, integration tests | Libraries / Resilience |
-| Public errors, builders, abstractions, async APIs | Libraries / UX |
-| Declarative and procedural macros | Macro |
-| Allocation, hot paths, yielding, throughput | Performance |
-| Workspace layout, edition, MSRV | Project |
-| Agent edits, ports, public paths, meaningful tests | AI |
+| Naming, `Debug`/`Display`, magic values, lints, static analysis, logging, crate size | Universal Guidelines |
+| Application error types, allocator, `target-cpu` | Application Guidelines |
+| Panics, `unsafe`, soundness | Correctness Guidelines |
+| Rustdoc structure, first sentences, module docs, `#[doc(inline)]` | Documentation |
+| FFI crate naming and layering, DLL state | FFI Guidelines |
+| Cargo features, out-of-the-box builds, `-sys` crates | Libraries / Building Guidelines |
+| `Send`, `AsRef`, I/O and range parameters, foreign types and re-exports | Libraries / Interoperability Guidelines |
+| Statics, strong types, mockable I/O, builder validation, tests, telemetry | Libraries / Resilience Guidelines |
+| Library errors, builders, abstractions, `async fn`, generics, modules, services | Libraries / UX Guidelines |
+| Declarative and procedural macros | Macros Guidelines |
+| Allocation, hashing, hot paths, async stack size, yielding, throughput | Performance Guidelines |
+| Workspace layout, edition, MSRV | Project Guidelines |
+| AI-friendly APIs, ports from other languages, single item paths, meaningful tests | AI Guidelines |
 
-For an unfamiliar crate or a broad review, start with
-[M-UPSTREAM-GUIDELINES](references/upstream/universal/M-UPSTREAM-GUIDELINES.md)
-and the applicable topics. For a narrow task, go directly to its rules. If an
-identifier is absent from the index, say it is absent from this snapshot rather
-than inventing its contents.
+For a broad review or an unfamiliar crate, begin with
+[M-UPSTREAM-GUIDELINES](references/upstream/universal/M-UPSTREAM-GUIDELINES.md),
+then the sections that apply. For a narrow task, go straight to the relevant
+rules. If a requested identifier is not in the index, state that it is absent
+from this snapshot; do not reconstruct its content.
 
-## Apply with context
+## Applying rules
 
-- Follow explicit user requirements and repository conventions. Preserve the
-  original distinction between **must**, **should**, and **may**. Microsoft design
-  preferences are not automatically Rust language requirements.
-- Apply application and library rules to the correct crates. In particular,
-  [M-APP-ERROR](references/upstream/apps/M-APP-ERROR.md) permits application error
-  crates, while reusable library errors have different guidance in
+- **Precedence.** Explicit user requirements and repository conventions take
+  precedence. The guidelines are a team-adopted standard, not Rust language
+  requirements.
+- **Strength.** Preserve the wording of each rule: _must_ rules are meant to
+  always hold; _should_ rules allow more flexibility; _may_ rules grant a
+  permission.
+- **Intent.** Follow the spirit of a rule, not only its letter. Understand why a
+  rule exists before departing from it, and do not apply it where doing so would
+  defeat its purpose (see the
+  [upstream applicability notes](references/upstream/README.md)). Flexibility
+  never justifies unsound code.
+- **Crate kind.** Apply application and library rules to the right crates. For
+  example, [M-APP-ERROR](references/upstream/apps/M-APP-ERROR.md) allows
+  application-level error crates, whereas libraries follow
   [M-ERRORS-CANONICAL-STRUCTS](references/upstream/libs/ux/M-ERRORS-CANONICAL-STRUCTS.md).
-- Keep the change within the requested scope. Allocator changes, deployment CPU
-  flags, MSRV bumps, dependency swaps, and public API redesigns require relevant
-  project context; finding a recommendation is not a reason to add them to an
-  unrelated edit. Guideline flexibility never justifies unsound code.
-- Retain existing compatibility commitments unless the task includes migration.
-  Consult current authoritative documentation when crate versions, language
-  features, or tool availability matter; the bundled snapshot is not a promise
-  that an example's dependency version is current.
-- Validate observable behavior with the project's existing checks. Respect its
-  command runner, including `mbx` when required, instead of bypassing it with
-  bare Cargo. Select additional tools such as Miri or feature checks only when
-  warranted by the change. Report unavailable or unrun checks accurately.
+- **Scope.** Keep changes within the task. Allocator changes, `target-cpu`
+  flags, MSRV or edition bumps, dependency replacements, and public API
+  redesigns need a project-level reason; a matching rule alone does not justify
+  adding them to an unrelated change. Keep existing compatibility commitments
+  unless the task includes a migration.
+- **Currency.** Rule examples may name crate versions or tools that have since
+  changed. Check current documentation when versions, language features, or
+  tool availability matter.
+- **Verification.** Validate behavior with the project's existing build, test,
+  and lint commands, through its own task runner where it has one. Add tools
+  such as Miri or feature-combination checks only when the change warrants
+  them. Report any check that was not run or could not be run.
 
-When reviewing, connect each actionable finding to a location, a concrete effect,
-and the applicable rule ID. Distinguish correctness problems from optional design
-recommendations. When implementing, explain material decisions briefly; do not
-add guideline compliance tables or design journals to product documentation.
+## Reporting
 
-## Source and maintenance
+- In a review, tie each finding to a code location, its concrete effect, and the
+  rule ID. Separate correctness defects from optional design recommendations.
+- When implementing, explain significant decisions briefly. Do not add
+  guideline-compliance tables or design narratives to product documentation
+  ([M-NO-META-DESIGN-DOCUMENTATION](references/upstream/ai/M-NO-META-DESIGN-DOCUMENTATION.md)).
 
-[Snapshot metadata](references/snapshot.json) pins the upstream commit and hashes
-the bundled files. Rule text and illustrations are copied byte for byte from
-[microsoft/rust-guidelines](https://github.com/microsoft/rust-guidelines), with
+## Source and updates
+
+Rule texts and illustrations are byte-for-byte copies from
+[microsoft/rust-guidelines](https://github.com/microsoft/rust-guidelines) under
 [Microsoft's MIT license](references/upstream/LICENSE.md).
+[snapshot.json](references/snapshot.json) records the pinned upstream commit and
+a SHA-256 hash of each bundled file.
 
-Use the local index to resolve cross-rule IDs. Original relative book links are
-preserved; resolve other book links against the corresponding page of the
-[upstream website](https://microsoft.github.io/rust-guidelines/).
+Resolve `M-*` cross-references through the local index. Relative links inside
+rules are preserved as published; resolve any that do not map to a local file
+against the [upstream website](https://microsoft.github.io/rust-guidelines/).
 
-Use the pinned snapshot by default. Refresh only when the task calls for an
-update; run `python3 scripts/sync_guidelines.py --ref main` from this skill's
-directory, then inspect the diff. Use `--check` to verify the local snapshot
-without network access. Do not edit generated reference files by hand.
+Use the pinned snapshot unless the task is to update it. To update, run
+`python3 scripts/sync_guidelines.py --ref main` from the skill directory and
+review the diff; `--check` verifies the snapshot offline. Do not edit generated
+files under `references/` by hand.

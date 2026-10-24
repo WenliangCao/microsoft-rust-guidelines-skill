@@ -11,7 +11,7 @@ byte from `src/guidelines/` at the commit recorded in
 also copied without changes. `references/index.md` is a generated navigation aid
 using upstream titles; it is not a replacement or summary of the rule bodies.
 
-`SKILL.md`, the repository documentation, metadata, synchronization script, and
+`SKILL.md`, the repository documentation, the synchronization script, and the
 tests are independent additions. This project is not affiliated with or endorsed
 by Microsoft. The name identifies the source of the guidelines; no Microsoft
 logo is included.

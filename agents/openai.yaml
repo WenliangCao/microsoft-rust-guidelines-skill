@@ -1,4 +1,0 @@
-interface:
-  display_name: "Microsoft Rust Guidelines"
-  short_description: "Apply original Microsoft Rust rules on demand"
-  default_prompt: "Use $microsoft-rust-guidelines to review this Rust code and read only the rules relevant to the task."
