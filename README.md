@@ -1,79 +1,87 @@
 # Microsoft Rust Guidelines Skill
 
-把微软的 [Pragmatic Rust Guidelines](https://microsoft.github.io/rust-guidelines/)
-打包成可按需读取的 agent skill，用于编写、审查和重构 Rust 代码。
+An agent skill that packages Microsoft's
+[Pragmatic Rust Guidelines](https://microsoft.github.io/rust-guidelines/)
+for on-demand use when writing, reviewing, and refactoring Rust code.
 
-这是独立维护的 skill，与 Microsoft 无隶属或背书关系。
+This skill is independently maintained and is not affiliated with or endorsed by Microsoft.
 
-## 设计
+## Design
 
-入口是简短的 [SKILL.md](SKILL.md)，规则按任务加载：
+The concise [SKILL.md](SKILL.md) entrypoint directs the agent to load rules relevant to the task:
 
 ```text
-SKILL.md → references/index.md → 相关的 M-*.md 原文
+SKILL.md → references/index.md → relevant original M-*.md rule files
 ```
 
-规则正文和配图均从上游逐字节复制，保留示例、例外、版权声明与规则 ID。
-不把全文塞进入口，不混合其他指南后冒充微软原文，也不把微软的设计偏好
-当成 Rust 语言的强制要求。Rust API Guidelines 等补充来源仍按原文链接查阅。
+Rule texts and illustrations are copied byte for byte from upstream, preserving
+examples, exceptions, copyright notices, and rule IDs. The entrypoint uses
+selective loading to keep context focused. Microsoft's original guidance remains
+separate from other sources, and its design preferences are distinguished from
+Rust language requirements. Supplementary sources, such as the Rust API Guidelines,
+are available through the original links.
 
-上游版本、commit、规则数量和文件 SHA-256 见
-[references/snapshot.json](references/snapshot.json)；完整目录见
-[规则索引](references/index.md)。日常使用无需联网。
+See [references/snapshot.json](references/snapshot.json) for the pinned upstream
+commit, rule count, and file SHA-256 hashes. Browse all rules in the
+[rule index](references/index.md). Normal use requires no network access.
 
-## 安装到 Codex
+## Install in Codex
 
-把本仓库克隆到 Codex 的 skills 目录，目录名使用技能名：
+Clone this repository into Codex's skills directory, using the skill name as the directory name:
 
 ```sh
 git clone https://github.com/WenliangCao/microsoft-rust-guidelines-skill.git \
   "${CODEX_HOME:-$HOME/.codex}/skills/microsoft-rust-guidelines"
 ```
 
-如果该目录已存在，请更新已有安装或选择另一个安装位置，避免覆盖。
-安装后在新的会话中使用。其他支持 `SKILL.md` 的 agent 可将同一目录安装到
-各自的技能目录；`agents/openai.yaml` 仅提供 Codex 展示信息。
+If the directory already exists, update the existing installation or choose another
+location to avoid overwriting it. Start a new session after installation.
+Other agents that support `SKILL.md` can use the same directory in their respective
+skills locations; `agents/openai.yaml` provides Codex display metadata only.
 
-## 使用
+## Usage
 
 ```text
-用 $microsoft-rust-guidelines 审查这个 Rust crate，优先检查错误处理和公共 API。
+Use $microsoft-rust-guidelines to review this Rust crate, focusing on error handling and public APIs.
 ```
 
 ```text
-用 $microsoft-rust-guidelines 实现这个功能，只读取与当前改动相关的规则。
+Use $microsoft-rust-guidelines to implement this feature, reading only the rules relevant to the change.
 ```
 
 ```text
-按 $microsoft-rust-guidelines 核对 M-TYPES-SEND 在这个异步 API 上是否适用。
+Use $microsoft-rust-guidelines to check whether M-TYPES-SEND applies to this async API.
 ```
 
-技能支持自动发现。具体执行仍遵守项目约束，例如 MSRV、已有 API 兼容性、
-部署目标，以及项目要求的 `mbx` 等命令入口。
+The skill supports automatic discovery. It respects project constraints, including
+MSRV, existing API compatibility, deployment targets, and required command runners
+such as `mbx`.
 
-## 维护与校验
+## Maintenance and validation
 
-同步工具只依赖 Python 3.10+ 和 Git，测试只使用 Python 标准库。
+The synchronization tool requires Python 3.10+ and Git. Tests use only the Python standard library.
 
 ```sh
-# 离线核对已提交文件的完整性。
+# Verify the integrity of the committed snapshot offline.
 python3 scripts/sync_guidelines.py --check
 
-# 运行同步工具的行为测试。
+# Run behavior tests for the synchronization tool.
 python3 -m unittest discover -s tests -v
 
-# 显式更新到上游 main，或将 main 换成具体 commit。
+# Explicitly update to upstream main, or replace main with a specific commit.
 python3 scripts/sync_guidelines.py --ref main
 git diff
 ```
 
-不带 `--ref` 同步时沿用当前固定的 commit。更新会重建
-`references/upstream/`、`references/index.md` 和 `references/snapshot.json`；
-发布前检查原文变动和入口的主题映射。校验只证明文件与记录的快照一致，
-不等于已经审查了某个 Rust 项目的全部行为。
+Running synchronization without `--ref` preserves the currently pinned commit.
+Updates regenerate `references/upstream/`, `references/index.md`, and
+`references/snapshot.json`. Before publishing an update, review the upstream changes
+and the entrypoint's topic mapping. Validation checks consistency with the recorded
+snapshot; assessing a Rust project's behavior still requires a separate review.
 
-## 许可证
+## License
 
-技能说明与同步工具使用 [MIT License](LICENSE)。微软原文与配图保留
-[上游 MIT License](references/upstream/LICENSE.md)。来源及处理方式见
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+The skill instructions and synchronization tool use the [MIT License](LICENSE).
+Microsoft's original texts and illustrations retain the
+[upstream MIT License](references/upstream/LICENSE.md). See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution and packaging details.
